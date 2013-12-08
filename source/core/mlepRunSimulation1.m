@@ -26,7 +26,7 @@ parfor i = 1:instanceInfo.instCount
     fileNo = size(files,2);
     for j = 1:fileNo
         cmd = ['runenergyplus ' rFolder char(files(j))  ' USA_IL_Chicago-OHare.Intl.AP.725300_TMY3'];
-        sendCommand(instanceInfo.pubDNSName(i,:), cmd, keyName, 'true');
+        mlepSendCommand(instanceInfo.pubDNSName(i,:), cmd, keyName, true);
         msg = ['Simulation ',num2str(j), ' on machine #',num2str(i), ' done' ];
         disp(msg);
     end 
