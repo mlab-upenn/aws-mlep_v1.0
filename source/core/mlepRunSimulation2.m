@@ -21,7 +21,7 @@ end
 rFolder = [a filesep b];
 
 % for each EC2 instance
-for i = 1:instanceInfo.instCount
+parfor i = 1:instanceInfo.instCount
     allFiles= dir([lFolder num2str(i) filesep '*.txt']);
     files = {allFiles.name};
     fileNo = size(files,2);
