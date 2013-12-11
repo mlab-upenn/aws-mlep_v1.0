@@ -35,109 +35,63 @@ ep.pushAllToAWS(lFolder, rFolder, false);
 pause(10);
 
 %% Set GA parameters
-popsize = 10;
+popsize = 24;
+numVar = 1;
 dimension = 10;
-stringlength = 10;
-x_bound = repmat([20 25], dimension, 1);
-pm = 0.05;
+bitPerVar = 4;
+offset = 21;
+chromoLen = numVar * bitPerVar;
+
 numGen = 20;
-elitsize = floor(0.5*popsize);
-% Store progress
-best = zeros(1, numGen);
-ave = zeros(1, numGen);
-worst = zeros(1, numGen);
-popAll = zeros(numGen, popsize, stringlength*dimension+1);
+
+
 
 %% Generate Initial Generation
 % Generate initial population
-pop = genInitPop(popsize,stringlength,dimension);
-% Decode 
-popDec = decodePop(pop,stringlength,dimension,x_bound);
-% Create Schedules
-mlepCreateScheduleFile(popDec);
-% Push Schedule files to AWS 
-lFolder = 'schedule'; 
-ep.pushToAWS(lFolder, rFolder, false); 
-% Needs time to copy
-pause(10);
+pop = genInitScheduleTXT(popsize,numVar,dimension,bitPerVar,offset);
 
-%% Run Initial Batch
-% Run simulation on AWS
-ep.runSimulationOnAWSmlep(lFolder, rFolder, false);
-% Move simulation result to proper folders
-ep.moveFileOnAWS(rFolder, true);
-pause(5);
-% Fetch simulation result on AWS
-ep.fetchDataOnAWS(rFolder);
-pause(10);
-% Load Data
-csvData = loadCSVs('OutputCSV');
-save('csvData.mat', 'csvData');
-% Evaluate fitness
-pop = evalFitMlep(pop,popDec,stringlength,dimension);
-% Pick the fittest individual
-[choice_number,choice_k] = max(pop(:,stringlength*dimension+1));
-choice = pop(choice_k,:);
 
 %% GENERATIONS
 for i=1:numGen
-    % Cross Over
-    new_pop = crossOver(pop,popsize,stringlength,dimension);
-    % Mutation
-    pop = gaMutate(new_pop,stringlength,dimension,pm);
-    % Decoding
-    popDec = decodePop(pop,stringlength,dimension,x_bound);
-
-    %% CREATE NEW SCHEDULES
-    % Create Schedules
-    mlepCreateScheduleFile(popDec);
-    % Push Schedule files to AWS
-    lFolder = 'schedule';
-    ep.pushToAWS(lFolder, rFolder, false);
+    i
+    % Push Schedule files to AWS 
+    lFolder = 'schedule'; 
+    ep.pushToAWS(lFolder, rFolder, false); 
     % Needs time to copy
-    pause(10);
-
-    %% RUN NEW SIMULATION
+    pause(4);
     % Run simulation on AWS
-    ep.runSimulationOnAWSmlep(lFolder, rFolder, true);
+    ep.runSimulationOnAWSmlep(lFolder, rFolder, false);
     % Move simulation result to proper folders
     ep.moveFileOnAWS(rFolder, true);
-    pause(5);
+    pause(2);
     % Fetch simulation result on AWS
     ep.fetchDataOnAWS(rFolder);
-    pause(10);
+    while(~(size(dir('OutputCSV'),1) == (popsize + 2)))
+        disp('waiting for results');
+    end
     % Load Data
     csvData = loadCSVs('OutputCSV');
-    save('csvData.mat', 'csvData');
-    
-    %% EVALUE FITNESS
-    % Evaluate fitness
-    pop = evalFitMlep(pop, popDec,stringlength,dimension);
-    [number,k]=max(pop(:,stringlength*dimension+1));
-    
-    % Find Best Choice
-    if choice_number<number
-        choice_number=number;
-        choice_k=k;
-        choice=pop(choice_k,:);
-    end
-    
-    % Discard worst one
-    pop = gaSelection(pop,popsize,stringlength,dimension,elitsize); % ,elitsize
-    [number,m] = min(pop(:,stringlength*dimension+1));
-    pop(m,:) = choice;
-     
+    data = cell2mat(csvData.data);
     % Save progress
-    best(i) = max(pop(:,stringlength*dimension+1));
-    ave(i) = mean(pop(:,stringlength*dimension+1));
-    worst(i) = min(pop(:,stringlength*dimension+1));
-    popAll(i,:,:) = pop;
+    allSchedule{i} = pop;
+    allData{i} = data;
+    save schedule allSchedule;
+    save data allData;
+    % Evaluate fitness
+    fitness = getFitness(data(33:72,7:8:end), data(33:68,8:8:end));
+    % Select crossover candidates according to fitness
+    sel = selection(fitness,popsize);   
+    % Cross Over
+    recombinedChromosomes = recombinationaAll(pop(sel,:), chromoLen,bitPerVar);
+    % Mutation
+ 	pop = mutation(recombinedChromosomes, chromoLen);
+    % Generate new schedule txt files
+    genTXTSchedule(pop, chromoLen, bitPerVar, offset);
+
+    
+     
 end
 
 % Plot Progress
-x = 1:numGen;
-figure;plot(x, best, 'r', x, ave, 'b', x, worst, 'c');
-legend('best', 'ave', 'worst');
- 
 toc
 

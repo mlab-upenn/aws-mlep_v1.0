@@ -23,19 +23,19 @@ ep.initEC2Client();
 ep.getAwsInstanceInfo(); 
 %Remove old file on AWS
 rFolder = '/home/ubuntu/simulation/';
-ep.removeFolderOnAws(rFolder);
+ep.removeFolderOnAws(rFolder,true);
 % Push Base files to AWS 
 lFolder = 'files'; 
-ep.pushAllToAWS(lFolder, rFolder); 
+ep.pushAllToAWS(lFolder, rFolder,true); 
 % Push Base files to AWS 
 lFolder = 'schedule'; 
-ep.pushToAWS(lFolder, rFolder); 
+ep.pushToAWS(lFolder, rFolder,true); 
 % Needs time to copy
 pause(10);
 % Run simulation on AWS
-ep.runSimulationOnAWSmlep(lFolder, rFolder);
+ep.runSimulationOnAWSmlep(lFolder, rFolder, true);
 % Move simulation result to proper folders
-ep.moveFileOnAWS(rFolder);
+ep.moveFileOnAWS(rFolder, true);
 % Fetch simulation result on AWS
 ep.fetchDataOnAWS(rFolder);
 % Load Data
