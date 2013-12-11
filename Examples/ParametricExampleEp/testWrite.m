@@ -15,7 +15,7 @@ param.pipeL = {300};
 param.loopVolume = {4};
 
 % generateTemplate
-filename = '5ZoneAirCooledCondenser.idf';
+filename = '5ZoneAirCooled.idf';
 newFile = 'test1.idf';
 controls = mlepGenParametric(filename, param, newFile);
 save('controls.mat', 'controls');
@@ -23,7 +23,11 @@ save('controls.mat', 'controls');
 % Generate Multiple E+ Files
 [status, msg] = system(['parametricpreprocessor ' newFile '&'],'-echo');
 
-% Copy all generated files to 'files' folder
-[~, name, ~] = fileparts(newFile);
-[status, msg] = system(['mv ' name '-* ' 'files' filesep ' &'],'-echo');
+% Go ahead and copy all files into 'files' folder
+fileName = 'files';
+[status,message,messageid] = rmdir(['.' filesep fileName],'s');
+[status,message,messageid] = mkdir(['.' filesep fileName]);
+
+
+
 
