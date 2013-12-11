@@ -1,0 +1,6 @@
+% STEPS TO RUN 
+1. Edit and Run 'mlepAwsInit'.
+2. Run 'mlepInitInstances(number_of_instances, type_of_instance)'.
+3. setSchedules.m to set the input text files with the schedules. 
+4. Run 'runExample'.
+5. Review Results.
