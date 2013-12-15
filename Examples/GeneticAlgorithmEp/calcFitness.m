@@ -14,7 +14,10 @@ energyTot = energyEle + energyGas;
 % Fitness
 minV = min(energyTot);
 maxV = max(energyTot);
-fitness = energyTot - (maxV-minV)*0.9;
+fitness = energyTot - (maxV-minV)*0.98;
+
+% Re-scale
+fitness  = fitness/sum(fitness);
 
 
 

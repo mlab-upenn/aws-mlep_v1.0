@@ -59,7 +59,7 @@ for i=1:numGen
     ep.runSimulationOnAWSep(lFolder, rFolder);
     % Move simulation result to proper folders
     ep.moveFileOnAWS(rFolder, true);
-    pause(2);
+    pause(5);
     % Fetch simulation result on AWS
     ep.fetchDataOnAWS(rFolder);
     while(~(size(dir('OutputCSV'),1) == (popsize + 2)))
@@ -79,6 +79,8 @@ for i=1:numGen
     save data allData;
     % Evaluate fitness
     fitness = calcFitness(data);
+    clear data;
+    clear csvData;
     % Select crossover candidates according to fitness
     sel = selection(fitness,popsize);   
     % Cross Over
