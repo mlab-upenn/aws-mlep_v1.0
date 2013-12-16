@@ -1,12 +1,14 @@
 
 clear
-load data.mat;
+load allData.mat;
 for i = 1:size(allData,2)
-   data = allData{i};
-   
-   
-   fitness(i) = mean(calcFitness(data));
-   fitnessMax(i) = max(calcFitness(data));
-    fitnessMin(i) = min(calcFitness(data));
-
+    data = allData{i};
+    [~, energy] = calcFitness(data);
+    fitness(i) = mean(energy);
+    fitnessMax(i) = max(energy);
+    fitnessMin(i) = min(energy);
+    
 end
+
+figure(1);plot([fitness; fitnessMax; fitnessMin]');
+legend('Mean', 'Max', 'Min');

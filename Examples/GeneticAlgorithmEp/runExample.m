@@ -14,6 +14,8 @@
 %   2013-09-11  Created. 
 
 clc;
+clear allSchedule allFitness allData;
+
 tic 
 %% Create an mlepAwsProcess instance and configure it
 ep = mlepAwsProcess();
@@ -28,19 +30,24 @@ rFolder = '/home/ubuntu/simulation/';
 ep.removeFolderOnAws(rFolder, false);
 
 %% Set GA parameters
-popsize = 4;
-dimension = 1;
-bitPerVar = 4;
+popsize = 12;
+dimension = 4;
+elitsize = 0.1;
+bitPerVar = 5;
 chromoLen = dimension * bitPerVar;
-limits = [1.5E-02;2.5E-02];
-numGen = 10;
-fields  = {'thickWD01'};
+% limits = [0.1E-02;20E-02]; % 1.99E-09
+limits = [6E-02 5E-02 0.3 0.5;12E-02 11E-02 0.7 0.85]; % 1.99E-09
+numGen = 20;
+% fields  = {'thickWD01'};
+fields  = {'thickIN02','thickIN46','solTxGREY3MM','solTxCLEAR3MM'};
+pm = 0.05;
 
 %% Generate Initial Generation
 % Generate initial population
 pop = genInitPop(popsize,bitPerVar,dimension);
 popDec = decodePop(pop,bitPerVar,dimension,limits);
-fileName = '5ZoneAirCooledTemp.idf';
+% fileName = '5ZoneAirCooledTemp.idf';
+fileName = '5ZoneAirCooledTemp1.idf';
 newFileName = 'test1.idf';
 % Generate Files
 folderName = 'schedule';
@@ -59,7 +66,7 @@ for i=1:numGen
     ep.runSimulationOnAWSep(lFolder, rFolder);
     % Move simulation result to proper folders
     ep.moveFileOnAWS(rFolder, true);
-    pause(5);
+    pause(4);
     % Fetch simulation result on AWS
     ep.fetchDataOnAWS(rFolder);
     while(~(size(dir('OutputCSV'),1) == (popsize + 2)))
@@ -75,26 +82,34 @@ for i=1:numGen
     % Save progress
     allSchedule{i} = pop;
     allData{i} = data;
-    save schedule allSchedule;
-    save data allData;
     % Evaluate fitness
-    fitness = calcFitness(data);
-    clear data;
-    clear csvData;
+    [fitness, ~] = calcFitness(data);
+    allFitness{i} = fitness;
+%     clear data;
+%     clear csvData;
     % Select crossover candidates according to fitness
-    sel = selection(fitness,popsize);   
+    newPop = gaSelection(pop,fitness,chromoLen,elitsize); 
+    size(pop)
+    size(newPop)
     % Cross Over
-    recombinedChromosomes = recombinationaAll(pop(sel,:), chromoLen,bitPerVar);
-    % Mutation
- 	pop = mutation(recombinedChromosomes, chromoLen);
-    
+%     recombinedChromosomes = recombinationaAll(newPop, chromoLen,bitPerVar);
+    newPop = gaCrossOver(newPop,popsize,bitPerVar,dimension);
+    size(newPop)
+    % Mutation 
+%  	pop = mutation(newPop, chromoLen);
+    pop = gaMutate(newPop,bitPerVar,dimension,pm);
+    size(pop)
     % Decode
     popDec = decodePop(pop,bitPerVar,dimension,limits);
-
+    size(popDec)
     % Generate new schedule txt files
     mlepGenFiles(folderName, fileName, newFileName, popDec, fields);
-
 end
+
+% Save Results
+save('allSchedule','allSchedule');
+save('allData','allData');
+save('allFitness','allFitness');
 
 % Plot Progress
 toc
