@@ -5,16 +5,15 @@ Cloud-Based Optimization (AWS) component for MLE+.
 
 Requirements
 ------------
-* UNIX Machine: aws-mlep can only be run on a unix-machine. This limitations is due to the 
-* AWS account credentials http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
-* Matlab  
+* UNIX Machine: aws-mlep can only be run on a unix-machine.  
+* AWS account credentials: http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html
+* Matlab Installation.  
 
 Installation
 ------------
 1. Download the folder into your machine or clone the repository. 
-2. Go into the install folder and edit the credential information with your own. 
-3. Run the installation file 
-4. 
+2. Go into the awsinit.m file and edit the credential information with your own. 
+3. Run the installation file awsinit.m 
 
 
 Examples
