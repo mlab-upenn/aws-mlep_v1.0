@@ -18,10 +18,20 @@ Installation
 
 Examples
 ========
-We have setup 4 different example projects that should be available to run as long as you have a AWS account. AWS-MLEP allows you to perform parametric simulation and search optimization by implementing a Genetic Algorithm. In each of these two categories we can optimized for design as well as run-time parameters. By design parameters we mean wall thickness, construction materials and  
+We have setup 4 different example projects that should be available to run as long as you have a AWS account. AWS-MLEP allows you to perform parametric simulation and search optimization by implementing a Genetic Algorithm. In each of these two categories we can optimized for design as well as run-time parameters. Design parameters refer to fixed value parameters during the simulation, these include wall thickness and material properties. Run-time parameters include room setpoints, occupancy, lighting, loads, etc.    
  
-
 Parametric Analysis
-This is an example to try multiple Material
+-------------------
+This is an example to try multiple construction material properties as well as different thickness. 
+
+1. Construction Material Properties
+2. Demand Response: Changes in setpoints strategies. 
+
+Seartch Optimization: Genetic Algorithm
+--------------------------------------
+This examples use the search optimization to find an optimal based on a objective function. 
+
+1. 
+2. 
 
 
